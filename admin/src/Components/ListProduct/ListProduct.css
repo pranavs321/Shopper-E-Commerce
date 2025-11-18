@@ -1,0 +1,152 @@
+/* src/Components/ListProduct/ListProduct.css */
+
+.list-product {
+  width: 100%;
+  max-width: 1150px;           /* makes the card wide like in the video */
+  margin: 32px auto;
+  padding: 28px 40px 34px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+.listproduct-title {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.listproduct-table {
+  width: 100%;
+}
+
+.listproduct-header {
+  display: grid;
+  grid-template-columns: 120px 1.7fr 0.7fr 0.7fr 0.8fr 60px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e4e4e4;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.listproduct-body {
+  width: 100%;
+}
+
+.listproduct-row {
+  display: grid;
+  grid-template-columns: 120px 1.7fr 0.7fr 0.7fr 0.8fr 60px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f1f1;
+  column-gap: 12px;
+}
+
+.listproduct-row:last-child {
+  border-bottom: none;
+}
+
+.listproduct-img-cell {
+  display: flex;
+  align-items: center;
+}
+
+.listproduct-img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.listproduct-name {
+  font-size: 14px;
+  color: #333;
+}
+
+.listproduct-price {
+  font-size: 14px;
+  color: #555;
+}
+
+.listproduct-category {
+  font-size: 14px;
+  text-transform: lowercase;
+  color: #777;
+}
+
+.listproduct-remove {
+  width: 32px;
+  height: 32px;
+  border: none;
+  outline: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.listproduct-remove img {
+  width: 14px;
+  height: 14px;
+}
+
+/* empty / loading text */
+.listproduct-empty {
+  padding: 18px 0;
+  font-size: 14px;
+  color: #777;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1024px) {
+  .list-product {
+    padding: 22px 18px 26px;
+    max-width: 100%;
+  }
+
+  .listproduct-header,
+  .listproduct-row {
+    grid-template-columns: 100px 1.6fr 0.8fr 0.8fr 0.9fr 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .list-product {
+    margin: 16px auto;
+    padding: 18px 14px 22px;
+  }
+
+  /* hide header, show card style on phones */
+  .listproduct-header {
+    display: none;
+  }
+
+  .listproduct-row {
+    grid-template-columns: 90px 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: 6px;
+    align-items: flex-start;
+  }
+
+  .listproduct-img-cell {
+    grid-row: 1 / 3;
+  }
+
+  .listproduct-name {
+    font-weight: 600;
+  }
+
+  .listproduct-price,
+  .listproduct-category {
+    font-size: 13px;
+  }
+
+  .listproduct-remove {
+    justify-self: flex-end;
+  }
+}

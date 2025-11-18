@@ -1,0 +1,102 @@
+/* src/Components/Item/Item.css */
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+/* IMAGE – keep it clean, no rounded corners */
+.item img {
+  width: 100%;
+  aspect-ratio: 3/5;        /* adjust ratio here if needed */
+  object-fit: cover;
+  border-radius: 0;           /* no rounded edges */
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+/* small hover lift like a real store */
+.item:hover img {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+}
+
+/* PRODUCT NAME */
+.item-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #111827;
+  line-height: 1.4;
+}
+
+/* PRICE ROW */
+.item-prices {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin-top: 0.1rem;
+}
+
+/* NEW / OFFER PRICE – bold & dark, like the second image */
+.item-new-price {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* OLD PRICE – light grey + strikethrough */
+.item-old-price {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+/* src/Components/Item/Item.css */
+
+.item {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* product image */
+.item img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* product name */
+.item > p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+  margin: 4px 0 0;
+}
+
+/* --- PRICE STYLING (for grids + related products) --- */
+
+.item-prices {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* NEW (discounted) price – bright orange + bold */
+.item-price-new {
+  color: #ff7f50;           /* orange like screenshot */
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* OLD price – grey, slightly lighter, with strike-through */
+.item-price-old {
+  color: #a8b0c0;
+  font-size: 14px;
+  text-decoration: line-through;
+  font-weight: 500;
+}

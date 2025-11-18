@@ -1,0 +1,52 @@
+/* src/Components/RelatedProducts/RelatedProducts.css */
+
+.related {
+  max-width: 1100px;
+  margin: 60px auto 80px;
+  padding: 0 16px;
+}
+
+/* Heading */
+.related-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #111;
+  margin-bottom: 6px;
+}
+
+/* coloured underline below title */
+.related-underline {
+  width: 90px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff7f50, #ff9b6a);
+  margin: 0 auto 32px;
+}
+
+/* Grid of product cards */
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+  .related-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .related-grid {
+    grid-template-columns: 1fr;
+  }
+}

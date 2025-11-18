@@ -1,0 +1,34 @@
+/* src/App.css */
+
+/* basic reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  background: #fdf5ff;           /* fallback */
+  color: #111827;
+}
+
+/* full-page pastel gradient for the whole app */
+.app-root {
+  min-height: 100vh;
+  background: linear-gradient(
+    145deg,
+    #fff4f7 0%,
+    #ffeaf7 30%,
+    #fdf5ff 60%,
+    #ffffff 100%
+  );
+}
+
+/* keeps content height sensible between navbar & footer */
+.app-main {
+  min-height: calc(100vh - 140px); /* roughly nav + footer height */
+  display: flex;
+  flex-direction: column;
+}

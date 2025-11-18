@@ -1,0 +1,85 @@
+.login-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999; /* above everything */
+}
+
+.login-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #0f172a;
+  color: #f9fafb;
+  border-radius: 18px;
+  padding: 20px 22px 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.7);
+}
+
+.login-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.login-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.login-modal-close {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.login-modal-close:hover {
+  color: #e5e7eb;
+}
+
+.login-modal-text {
+  font-size: 14px;
+  color: #d1d5db;
+  margin: 4px 0 16px;
+}
+
+.login-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.login-modal-btn {
+  border-radius: 999px;
+  border: none;
+  padding: 8px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.login-modal-btn--secondary {
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+}
+
+.login-modal-btn--secondary:hover {
+  background: #020617;
+}
+
+.login-modal-btn--primary {
+  background: linear-gradient(135deg, #ff6a3d, #ff4141);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(248, 113, 113, 0.5);
+}
+
+.login-modal-btn--primary:hover {
+  transform: translateY(-1px);
+}

@@ -1,0 +1,93 @@
+.add-product {
+  flex: 1;
+  padding: 2rem 3rem;
+  box-sizing: border-box;
+}
+
+.add-product h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.addproduct-form {
+  background-color: #ffffff;
+  padding: 1.5rem 1.8rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.addproduct-itemfield {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.addproduct-itemfield p {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.addproduct-itemfield input,
+.addproduct-itemfield select {
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #d1d1d1;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.addproduct-price-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.addproduct-thumbnail-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 8px;
+  object-fit: contain;
+  border: 1px dashed #b0b0b0;
+  padding: 0.8rem;
+  background-color: #fafafa;
+  cursor: pointer;
+}
+
+.addproduct-btn {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+  padding: 0.55rem 1.6rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #ff6b00;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.addproduct-btn:hover {
+  background-color: #ff7f1a;
+}
+
+@media (max-width: 900px) {
+  .add-product {
+    padding: 1.5rem;
+  }
+
+  .addproduct-price-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .add-product {
+    padding: 1rem;
+  }
+
+  .addproduct-form {
+    padding: 1rem 1.2rem;
+  }
+}

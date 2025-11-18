@@ -1,0 +1,50 @@
+.breadcrum {
+  max-width: 1200px;
+  margin: 20px auto 0;
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #8c8c8c;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.breadcrum .crumb {
+  white-space: nowrap;
+}
+
+/* clickable links (HOME / SHOP / category) */
+.breadcrum .crumb-link {
+  color: #8c8c8c;
+  text-decoration: none;
+  transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.breadcrum .crumb-link:hover {
+  color: #ff6b3d;
+  text-decoration: underline;
+}
+
+/* current page */
+.breadcrum .crumb-last {
+  color: #222;
+  font-weight: 600;
+}
+
+.breadcrum .separator {
+  color: #c7c7c7;
+  font-size: 14px;
+}
+
+/* small-screen tweak */
+@media (max-width: 600px) {
+  .breadcrum {
+    font-size: 11px;
+    padding: 12px 10px 8px;
+    flex-wrap: wrap;
+  }
+}

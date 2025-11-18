@@ -1,0 +1,73 @@
+/* frontend/src/Components/NewCollections/NewCollections.css */
+
+.new-collections {
+  width: 100%;
+  padding: 60px 80px;
+  background: #fff5f2; /* very light pastel, close to Popular */
+}
+
+/* center heading */
+.new-collections-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.new-collections-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #111;           /* dark text */
+  text-transform: uppercase;
+}
+
+/* black underline, centered */
+.new-collections-underline {
+  width: 90px;
+  height: 3px;
+  margin: 8px auto 0;    /* auto → center */
+  border-radius: 999px;
+  background: #000000;   /* black underline */
+}
+
+/* grid of items */
+.new-collections-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* make sure Item fills nicely */
+.new-collections .item {
+  height: 100%;
+}
+
+/* responsive tweaks */
+@media (max-width: 1024px) {
+  .new-collections {
+    padding: 40px 24px;
+  }
+
+  .new-collections-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .new-collections-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .new-collections-header h2 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 540px) {
+  .new-collections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .new-collections {
+    padding: 32px 16px;
+  }
+}

@@ -1,0 +1,135 @@
+/* full-page background area (inside main content) */
+.login-page {
+  width: 100%;
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #fbd7ff 0%, #ffeefe 35%, #ffffff 100%);
+}
+
+/* wrapper so card stays centered */
+.login-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* white card in the middle */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.login-card h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 22px;
+}
+
+/* form + inputs */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-input {
+  width: 100%;
+  height: 52px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  padding: 0 14px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+
+.login-input::placeholder {
+  color: #b7b7b7;
+}
+
+.login-input:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 0 2px rgba(255, 127, 80, 0.2);
+}
+
+/* main button */
+
+.login-button {
+  margin-top: 8px;
+  width: 100%;
+  height: 50px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: #ff4b4b;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.login-button:hover {
+  background: #ff3030;
+  box-shadow: 0 8px 20px rgba(255, 75, 75, 0.4);
+  transform: translateY(-1px);
+}
+
+.login-button:active {
+  transform: scale(0.98);
+}
+
+/* toggle text link */
+
+.login-toggle {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.login-toggle span {
+  color: #ff4b4b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* checkbox / terms */
+
+.login-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 8px;
+}
+
+.login-check input {
+  margin-top: 3px;
+}
+
+/* responsive */
+
+@media (max-width: 600px) {
+  .login-page {
+    padding: 40px 14px;
+  }
+
+  .login-card {
+    padding: 26px 20px 22px;
+  }
+
+  .login-card h2 {
+    font-size: 22px;
+  }
+}

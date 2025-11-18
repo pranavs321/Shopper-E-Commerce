@@ -1,0 +1,27 @@
+/* src/Pages/CSS/Shop.css */
+
+.shop-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+/* section spacing */
+.shop-section {
+  width: 100%;
+}
+
+/* keep content centered on huge screens */
+.shop-page > * {
+  width: 100%;
+}
+
+/* small tweak for mobile */
+@media (max-width: 768px) {
+  .shop-page {
+    gap: 40px;
+  }
+}
