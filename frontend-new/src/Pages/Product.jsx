@@ -1,7 +1,9 @@
-
+// src/Pages/Product.jsx
 import React, { useContext } from "react";
-import { ShopContext } from "../Context/ShopContext";
 import { useParams } from "react-router-dom";
+
+import { ShopContext } from "../Context/ShopContext";
+
 import Breadcrum from "../Components/Breadcrums/Breadcrums";
 import ProductDisplay from "../Components/ProductDisplay/ProductDisplay";
 import DescriptionBox from "../Components/DescriptionBox/DescriptionBox";
@@ -25,7 +27,10 @@ const Product = () => {
     <>
       <Breadcrum product={product} />
       <ProductDisplay product={product} />
-      <DescriptionBox product={product} />
+
+      {/* 🔹 pass productId to DescriptionBox */}
+      <DescriptionBox productId={product.id} />
+
       <RelatedProducts currentProduct={product} />
     </>
   );

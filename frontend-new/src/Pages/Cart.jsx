@@ -11,6 +11,7 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     getTotalCartAmount,
+    clearCart,          // ⭐ from context
   } = useContext(ShopContext);
 
   const navigate = useNavigate();
@@ -39,15 +40,21 @@ const Cart = () => {
   );
 
   const subtotal = getTotalCartAmount();
-  const shippingFee = subtotal > 0 ? 0 : 0; // you can change this later
+  const shippingFee = subtotal > 0 ? 0 : 0; // can change later
   const grandTotal = subtotal + shippingFee;
 
   const formattedCurrency = (amt) => `₹${amt.toFixed(2)}`;
 
   const handleProceedCheckout = () => {
     if (grandTotal === 0) return;
-    // later you can navigate to /checkout
-    alert("Checkout flow will be implemented next 🙂");
+    navigate("/checkout");
+  };
+
+  const handleClearCart = () => {
+    if (grandTotal === 0) return;
+    const ok = window.confirm("Are you sure you want to clear the cart?");
+    if (!ok) return;
+    clearCart();
   };
 
   return (
@@ -132,7 +139,7 @@ const Cart = () => {
                   <div className="cart-cell cart-cell-remove">
                     <button
                       className="remove-btn"
-                      onClick={() => removeFromCart(product.id, true)} // 2nd arg can be ignored if not used
+                      onClick={() => removeFromCart(product.id)}
                     >
                       ×
                     </button>
@@ -169,13 +176,23 @@ const Cart = () => {
                 <span>{formattedCurrency(grandTotal)}</span>
               </div>
 
-              <button
-                className="cart-checkout-btn"
-                onClick={handleProceedCheckout}
-                disabled={grandTotal === 0}
-              >
-                PROCEED TO CHECKOUT
-              </button>
+              <div className="cart-buttons-row">
+                <button
+                  className="cart-clear-btn"
+                  onClick={handleClearCart}
+                  disabled={grandTotal === 0}
+                >
+                  CLEAR CART
+                </button>
+
+                <button
+                  className="cart-checkout-btn"
+                  onClick={handleProceedCheckout}
+                  disabled={grandTotal === 0}
+                >
+                  PROCEED TO CHECKOUT
+                </button>
+              </div>
             </div>
 
             {/* RIGHT: Promo code box */}

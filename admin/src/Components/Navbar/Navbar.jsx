@@ -1,3 +1,4 @@
+// src/Components/Navbar/Navbar.jsx
 import React from "react";
 import "./Navbar.css";
 import logo from "../Assets/shoplogo.png";

@@ -1,0 +1,35 @@
+/* src/Components/AdminUsers/AdminUsers.css */
+
+.admin-users-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.6fr 0.7fr 1.1fr;
+  column-gap: 12px;
+  align-items: center;
+}
+
+.admin-muted-email {
+  font-size: 13px;
+  color: #555;
+  word-break: break-all;
+}
+
+/* responsive */
+
+@media (max-width: 900px) {
+  .admin-users-grid {
+    grid-template-columns: 1fr 1.4fr 0.8fr 0.9fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-table-header.admin-users-grid {
+    display: none;
+  }
+
+  .admin-table-row.admin-users-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 4px;
+  }
+}

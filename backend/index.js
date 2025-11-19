@@ -58,7 +58,7 @@ const Product = mongoose.model("Product", {
     required: true,
   },
   image: {
-    type: String, // image URL from /upload
+    type: String, // image URL from /upload or seed
     required: true,
   },
   category: {
@@ -83,6 +83,67 @@ const Product = mongoose.model("Product", {
   },
 });
 
+// ================== ORDER MODEL ==================
+const Order = mongoose.model("Order", {
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+    required: true,
+  },
+  items: [
+    {
+      productId: { type: Number, required: true }, // Product.id
+      name: String,
+      price: Number,
+      quantity: Number,
+    },
+  ],
+  totalAmount: {
+    type: Number,
+    required: true,
+  },
+  shippingAddress: {
+    type: String,
+    default: "Not provided",
+  },
+  status: {
+    type: String,
+    enum: ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"],
+    default: "PLACED",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// ================== REVIEW MODEL ==================
+const Review = mongoose.model("Review", {
+  productId: {
+    type: Number,
+    required: true, // Product.id
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+    required: true,
+  },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    required: true,
+  },
+  comment: {
+    type: String,
+    default: "",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 // ================== USER MODEL ==================
 const Users = mongoose.model("Users", {
   name: {
@@ -92,14 +153,19 @@ const Users = mongoose.model("Users", {
   email: {
     type: String,
     required: true,
-    unique: true, // no duplicate emails
+    unique: true,
   },
   password: {
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ["customer", "seller", "admin"],
+    default: "customer", // ⭐ default
+  },
   cartData: {
-    type: Object, // {0:0, 1:0, ..., 299:0}
+    type: Object,
     default: {},
   },
 });
@@ -122,6 +188,22 @@ const fetchUser = (req, res, next) => {
     return res
       .status(401)
       .json({ success: false, message: "Invalid auth token" });
+  }
+};
+
+// Admin-only guard
+const requireAdmin = async (req, res, next) => {
+  try {
+    const user = await Users.findById(req.user.id);
+    if (!user || user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Admin access required" });
+    }
+    next();
+  } catch (err) {
+    console.error("requireAdmin error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -158,33 +240,88 @@ app.post("/upload", (req, res) => {
 // Add product
 app.post("/addproduct", async (req, res) => {
   try {
-    let products = await Product.find({});
-    let id = 1;
+    const { name, image, category, new_price, old_price, id } = req.body;
 
-    if (products.length > 0) {
-      const last_product = products[products.length - 1];
-      id = last_product.id + 1;
+    // basic validation
+    if (!name || !image || !category || new_price == null || old_price == null) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
     }
 
+    // 1) decide product id
+    let numericId;
+
+    // if admin sends an id, use it
+    if (id !== undefined && id !== null) {
+      numericId = Number(id);
+    } else {
+      // else generate next id based on max existing id
+      const lastProduct = await Product.findOne().sort({ id: -1 }).lean();
+      numericId = lastProduct ? lastProduct.id + 1 : 1;
+    }
+
+    // 2) create product
     const product = new Product({
-      id,
-      name: req.body.name,
-      image: req.body.image,
-      category: req.body.category,
-      new_price: req.body.new_price,
-      old_price: req.body.old_price,
+      id: numericId,
+      name,
+      image,
+      category,
+      new_price,
+      old_price,
     });
 
-    console.log("New product:", product);
     await product.save();
-    console.log("Product Saved");
+    console.log("✅ Product saved:", product);
 
-    res.json({
+    return res.json({
       success: true,
-      name: req.body.name,
+      product,
     });
   } catch (err) {
-    console.error("Add product error:", err);
+    console.error("❌ Add product error:", err);
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Server error",
+    });
+  }
+});
+
+// Edit product
+app.post("/editproduct", async (req, res) => {
+  try {
+    const { id, name, image, category, new_price, old_price, available } =
+      req.body;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Product id is required" });
+    }
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (image !== undefined) updateData.image = image;
+    if (category !== undefined) updateData.category = category;
+    if (new_price !== undefined) updateData.new_price = new_price;
+    if (old_price !== undefined) updateData.old_price = old_price;
+    if (available !== undefined) updateData.available = available;
+
+    const product = await Product.findOneAndUpdate({ id }, updateData, {
+      new: true,
+    });
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    console.log("Updated product:", product.id);
+    res.json({ success: true, product });
+  } catch (err) {
+    console.error("Edit product error:", err.message);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
@@ -218,7 +355,6 @@ app.get("/allproducts", async (req, res) => {
 // ================== SIGNUP ROUTE ==================
 app.post("/signup", async (req, res) => {
   try {
-    // 1) Check if email already exists
     let check = await Users.findOne({ email: req.body.email });
     if (check) {
       return res.status(400).json({
@@ -227,33 +363,34 @@ app.post("/signup", async (req, res) => {
       });
     }
 
-    // 2) Create empty cart object with 300 items
     let cart = {};
-    for (let i = 0; i < 300; i++) {
-      cart[i] = 0;
-    }
+    for (let i = 0; i < 300; i++) cart[i] = 0;
 
-    // 3) Create new user document
     const user = new Users({
-      name: req.body.username, // match your frontend field
+      name: req.body.username,
       email: req.body.email,
       password: req.body.password,
       cartData: cart,
+      // role: "customer"  // optional, default already set
     });
 
     await user.save();
 
-    // 4) Create JWT token
     const data = {
       user: {
-        id: user.id, // mongoose virtual id (string)
+        id: user.id,
       },
     };
 
     const token = jwt.sign(data, "secret_ecom");
 
-    // 5) Send token back
-    res.json({ success: true, token });
+    // ⭐ include role + name
+    res.json({
+      success: true,
+      token,
+      role: user.role,
+      name: user.name,
+    });
   } catch (err) {
     console.error("Signup error:", err);
     res.status(500).json({ success: false, message: "Server error" });
@@ -263,34 +400,32 @@ app.post("/signup", async (req, res) => {
 // ================== LOGIN ROUTE ==================
 app.post("/login", async (req, res) => {
   try {
-    // find user by email
     let user = await Users.findOne({ email: req.body.email });
 
-    if (user) {
-      const passCompare = req.body.password === user.password;
-
-      if (passCompare) {
-        const data = {
-          user: {
-            id: user.id,
-          },
-        };
-
-        const token = jwt.sign(data, "secret_ecom");
-
-        return res.json({ success: true, token });
-      } else {
-        return res.json({
-          success: false,
-          errors: "Wrong Password",
-        });
-      }
-    } else {
-      return res.json({
-        success: false,
-        errors: "Wrong Email Id",
-      });
+    if (!user) {
+      return res.json({ success: false, errors: "Wrong Email Id" });
     }
+
+    const passCompare = req.body.password === user.password;
+    if (!passCompare) {
+      return res.json({ success: false, errors: "Wrong Password" });
+    }
+
+    const data = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    const token = jwt.sign(data, "secret_ecom");
+
+    // ⭐ include role + name
+    return res.json({
+      success: true,
+      token,
+      role: user.role,
+      name: user.name,
+    });
   } catch (err) {
     console.error("Login error:", err.message);
     res.status(500).json({
@@ -326,6 +461,69 @@ app.get("/popularinwomen", async (req, res) => {
   }
 });
 
+// ================== PRODUCT REVIEWS ==================
+
+// Add review to a product
+app.post("/products/:id/reviews", fetchUser, async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+    const { rating, comment } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Rating must be between 1 and 5",
+      });
+    }
+
+    const product = await Product.findOne({ id: productId });
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    const review = new Review({
+      productId,
+      userId: req.user.id,
+      rating,
+      comment: comment || "",
+    });
+
+    await review.save();
+    res.json({ success: true, review });
+  } catch (err) {
+    console.error("Add review error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Get reviews + average rating for a product
+app.get("/products/:id/reviews", async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+    const reviews = await Review.find({ productId }).sort({
+      createdAt: -1,
+    });
+
+    const count = reviews.length;
+    const avg =
+      count === 0
+        ? 0
+        : reviews.reduce((sum, r) => sum + r.rating, 0) / count;
+
+    res.json({
+      success: true,
+      averageRating: avg,
+      count,
+      reviews,
+    });
+  } catch (err) {
+    console.error("Get reviews error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 // ================== CART ROUTES (PROTECTED) ==================
 
 /**
@@ -334,30 +532,39 @@ app.get("/popularinwomen", async (req, res) => {
  */
 app.post("/addtocart", fetchUser, async (req, res) => {
   try {
-    let userData = await Users.findOne({ _id: req.user.id });
-
-    if (!userData) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
+    const userId = req.user.id;
     const itemId = req.body.itemId;
 
-    if (userData.cartData[itemId] == null) {
-      userData.cartData[itemId] = 0;
+    let user = await Users.findById(userId);
+
+    if (!user) {
+      console.log("AddToCart: user not found:", userId);
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    userData.cartData[itemId] += 1;
+    if (!user.cartData) user.cartData = {};
 
-    await Users.findOneAndUpdate(
-      { _id: req.user.id },
-      { cartData: userData.cartData }
-    );
+    const key = String(itemId);
+    if (user.cartData[key] == null) {
+      user.cartData[key] = 0;
+    }
 
-    console.log("Added to cart:", itemId);
-    res.send("Added");
+    user.cartData[key] += 1;
+
+    await user.save();
+
+    console.log("AddToCart: cart after add =", user.cartData);
+
+    // ⭐ return full latest cart so frontend uses THIS as truth
+    return res.json({
+      success: true,
+      cartData: user.cartData,
+    });
   } catch (err) {
-    console.error("Add to cart error:", err.message);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Add to cart error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
@@ -367,27 +574,36 @@ app.post("/addtocart", fetchUser, async (req, res) => {
  */
 app.post("/removefromcart", fetchUser, async (req, res) => {
   try {
-    let userData = await Users.findOne({ _id: req.user.id });
-
-    if (!userData) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
+    const userId = req.user.id;
     const itemId = req.body.itemId;
 
-    if (userData.cartData[itemId] > 0) {
-      userData.cartData[itemId] -= 1;
-      await Users.findOneAndUpdate(
-        { _id: req.user.id },
-        { cartData: userData.cartData }
-      );
+    let user = await Users.findById(userId);
+
+    if (!user) {
+      console.log("RemoveFromCart: user not found:", userId);
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    console.log("Removed from cart:", itemId);
-    res.send("Removed");
+    if (!user.cartData) user.cartData = {};
+
+    const key = String(itemId);
+    if (user.cartData[key] > 0) {
+      user.cartData[key] -= 1;
+    }
+
+    await user.save();
+
+    console.log("RemoveFromCart: cart after remove =", user.cartData);
+
+    return res.json({
+      success: true,
+      cartData: user.cartData,
+    });
   } catch (err) {
-    console.error("Remove from cart error:", err.message);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Remove from cart error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
@@ -397,19 +613,236 @@ app.post("/removefromcart", fetchUser, async (req, res) => {
  */
 app.post("/getcart", fetchUser, async (req, res) => {
   try {
-    console.log("GetCart");
-    let userData = await Users.findOne({ _id: req.user.id });
+    const userId = req.user.id;
+    console.log("GetCart for user:", userId);
 
-    if (!userData) {
-      return res.status(404).json({ success: false, message: "User not found" });
+    let user = await Users.findById(userId);
+
+    if (!user) {
+      console.log("GetCart: user not found:", userId);
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    res.json(userData.cartData);
+    if (!user.cartData) user.cartData = {};
+
+    console.log("GetCart: sending cart =", user.cartData);
+
+    return res.json(user.cartData);
   } catch (err) {
-    console.error("Get cart error:", err.message);
+    console.error("Get cart error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// ================== CHECKOUT / ORDERS ==================
+
+// Place order using current cart
+app.post("/checkout", fetchUser, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { shippingAddress } = req.body;
+
+    const user = await Users.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const cartData = user.cartData || {};
+    const productIds = Object.keys(cartData)
+      .filter((id) => cartData[id] > 0)
+      .map((id) => Number(id));
+
+    if (productIds.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Cart is empty" });
+    }
+
+    const products = await Product.find({ id: { $in: productIds } });
+
+    const items = products.map((p) => {
+      const quantity = cartData[p.id] || 0;
+      return {
+        productId: p.id,
+        name: p.name,
+        price: p.new_price,
+        quantity,
+      };
+    });
+
+    const totalAmount = items.reduce(
+      (sum, i) => sum + i.price * i.quantity,
+      0
+    );
+
+    const order = new Order({
+      userId,
+      items,
+      totalAmount,
+      shippingAddress: shippingAddress || "Not provided",
+      status: "PLACED",
+    });
+
+    await order.save();
+
+    // clear cart entries for these products
+    const newCart = { ...cartData };
+    productIds.forEach((id) => {
+      newCart[id] = 0;
+    });
+    user.cartData = newCart;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Order placed successfully",
+      orderId: order._id,
+      order,
+    });
+  } catch (err) {
+    console.error("Checkout error:", err.message);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+// Get current user's orders
+app.get("/orders", fetchUser, async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.user.id }).sort({
+      createdAt: -1,
+    });
+    res.json({ success: true, orders });
+  } catch (err) {
+    console.error("Get orders error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Get single order (only if it belongs to user)
+app.get("/orders/:orderId", fetchUser, async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.orderId,
+      userId: req.user.id,
+    });
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    res.json({ success: true, order });
+  } catch (err) {
+    console.error("Get order error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// ================== ADMIN: ORDERS (Monitor Transactions / View Sales) ==================
+
+// Admin: see all orders
+app.get("/admin/orders", fetchUser, requireAdmin, async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate("userId", "name email role")
+      .sort({ createdAt: -1 });
+    res.json({ success: true, orders });
+  } catch (err) {
+    console.error("Admin orders error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Admin: update order status
+app.put(
+  "/admin/orders/:orderId/status",
+  fetchUser,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { status } = req.body;
+      const allowed = ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"];
+
+      if (!allowed.includes(status)) {
+        return res.status(400).json({ success: false, message: "Bad status" });
+      }
+
+      const order = await Order.findByIdAndUpdate(
+        req.params.orderId,
+        { status },
+        { new: true }
+      );
+
+      if (!order) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Order not found" });
+      }
+
+      res.json({ success: true, order });
+    } catch (err) {
+      console.error("Update order status error:", err.message);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  }
+);
+
+// ================== ADMIN: MANAGE USERS ==================
+
+// list users
+app.get("/admin/users", fetchUser, requireAdmin, async (req, res) => {
+  try {
+    const users = await Users.find({}, "name email role");
+    res.json({ success: true, users });
+  } catch (err) {
+    console.error("Admin users error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// change user role (customer / seller / admin)
+app.put(
+  "/admin/users/:userId/role",
+  fetchUser,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { role } = req.body;
+      const allowedRoles = ["customer", "seller", "admin"];
+
+      if (!allowedRoles.includes(role)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid role value" });
+      }
+
+      const user = await Users.findByIdAndUpdate(
+        req.params.userId,
+        { role },
+        { new: true, select: "name email role" }
+      );
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      console.log("Admin updated user role:", user.email, "->", user.role);
+      res.json({ success: true, user });
+    } catch (err) {
+      console.error("Admin update user role error:", err.message);
+      res
+        .status(500)
+        .json({ success: false, message: "Server error" });
+    }
+  }
+);
 
 // ================== START SERVER ==================
 app.listen(port, (error) => {

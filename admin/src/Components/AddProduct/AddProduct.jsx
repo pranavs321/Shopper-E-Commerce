@@ -60,7 +60,6 @@ const AddProduct = () => {
 
       // ---------- 2) SEND PRODUCT DETAILS ----------
       const productBody = {
-        id: Date.now(),                     // simple id like in the video
         name: details.name,
         image: image_url,
         category: details.category,

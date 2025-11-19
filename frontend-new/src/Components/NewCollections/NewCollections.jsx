@@ -1,47 +1,23 @@
 // src/Components/NewCollections/NewCollections.jsx
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import "./NewCollections.css";
 import Item from "../Item/Item";
-import men7 from "../Assets/men7.avif";
-import women11 from "../Assets/women11.avif";
-import women15 from "../Assets/women15.webp";
-import kid12 from "../Assets/kid12.avif";
+import { ShopContext } from "../../Context/ShopContext";
 
-const newCollectionsData = [
-  {
-    id: 7,
-    name: "Printed Half Sleeve Shirt",
-    image: men7,
-    new_price: 48,
-    old_price: 89,
-  },
-  {
-    id: 24,
-    name: "Dark Yellow Short Jacket",
-    image: women11,
-    new_price: 75,
-    old_price: 120,
-  },
-  {
-    id: 27,
-    name: "Light Blue Suit",
-    image: women15,
-    new_price: 40,
-    old_price: 70,
-  },
-  {
-    id: 39,
-    name: "Striped Frock",
-    image: kid12,
-    new_price: 44,
-    old_price: 75,
-  },
-];
+const FEATURED_IDS = [7, 24, 27, 39]; // the ones you want as "New Collections"
 
 const NewCollections = () => {
+  const { all_product } = useContext(ShopContext);
+
+  // pick from backend products using these ids
+  const newCollection = useMemo(() => {
+    if (!Array.isArray(all_product)) return [];
+    return all_product.filter((p) => FEATURED_IDS.includes(p.id));
+  }, [all_product]);
+
   return (
     <section
-      id="section-new-collections"       // 🔹 IMPORTANT: scroll target
+      id="section-new-collections"  // scroll target if you need smooth scroll
       className="new-collections"
     >
       <div className="new-collections-header">
@@ -50,7 +26,7 @@ const NewCollections = () => {
       </div>
 
       <div className="new-collections-grid">
-        {newCollectionsData.map((item) => (
+        {newCollection.map((item) => (
           <Item
             key={item.id}
             id={item.id}
